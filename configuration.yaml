@@ -1,0 +1,29 @@
+# Configure a default setup of Home Assistant (frontend, api, etc)
+default_config:
+cloud:
+
+# Text to speech
+tts:
+  - platform: google_translate
+
+group: !include groups.yaml
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml
+
+#lovelace:
+#  mode: yaml 
+
+sensor: !include temp.yaml
+
+weather:
+  - platform: openweathermap
+    api_key: !secret openweathermap_api_key
+
+#  - platform: waze_travel_time
+#    name: "Home to Campus"
+#    origin: zone.home
+#    destination: zone.science_drive_garage
+#    region: 'US'
+#    units: imperial
+

@@ -1,0 +1,53 @@
+title: Home
+views:
+  - path: default_view
+    title: Home
+    badges:
+      - entity: binary_sensor.updater
+      - entity: person.mitchell
+      - entity: sensor.hacs
+      - entity: sun.sun
+    cards:
+      - type: entities
+        entities:
+          - switch.wled_nightstand_right_nightlight
+          - switch.wled_nightstand_right_sync_send
+          - switch.wled_nightstand_right_sync_receive
+          - light.wled_nightstand_right
+          - sensor.wled_nightstand_right_estimated_current
+          - light.wled_nightstand_left
+          - switch.wled_nightstand_left_nightlight
+          - switch.wled_nightstand_left_sync_send
+          - switch.wled_nightstand_left_sync_receive
+          - sensor.wled_nightstand_left_estimated_current
+          - light.wled_bed
+          - switch.wled_bed_nightlight
+          - switch.wled_bed_sync_send
+          - switch.wled_bed_sync_receive
+          - sensor.wled_bed_estimated_current
+          - sensor.hp_colorlaserjet_m253_m254_black_cartridge_hp_cf500x
+          - sensor.hp_colorlaserjet_m253_m254_cyan_cartridge_hp_cf501x
+          - sensor.hp_colorlaserjet_m253_m254_magenta_cartridge_hp_cf503x
+          - sensor.hp_colorlaserjet_m253_m254_yellow_cartridge_hp_cf502x
+          - sensor.hp_colorlaserjet_m253_m254
+        title: Bedroom
+      - type: entities
+        entities:
+          - remote.55_tcl_roku_tv
+          - sensor.archera7v5_b_sent
+          - sensor.archera7v5_packets_received
+          - sensor.archera7v5_packets_sent
+          - sensor.archera7v5_kib_s_received
+          - sensor.archera7v5_kib_s_sent
+          - sensor.archera7v5_packets_s_received
+          - sensor.archera7v5_packets_s_sent
+          - sensor.archera7v5_b_received
+          - remote.harmony_hub
+        title: Living Room
+      - type: media-control
+        entity: media_player.55_tcl_roku_tv
+      - type: media-control
+        entity: media_player.vizio_sb3651
+      - type: weather-forecast
+        entity: weather.home
+

@@ -1,0 +1,38 @@
+# You can whitelist files/folders with !, these will not be ignored.
+!*.yaml
+!.gitignore
+!*.md
+!*.conf
+
+# Ignore everything with the following file endings:
+*.pid
+*.xml
+*.csr
+*.crt
+*.key
+*.conf
+*.pickle
+*.db-journal
+*.db-shm
+*.db-wal
+*.sqlite
+*.log
+*.db
+*.sqlite
+
+# Ignore folders.
+.storage
+.cloud
+.google.token
+core.*
+core
+hacs
+__pycache__
+deps
+
+# Specific files to make sure we ignore
+home-assistant.log
+home-assistant_v2.db
+ip_bans.yaml
+secrets.yaml
+known_devices.yaml
