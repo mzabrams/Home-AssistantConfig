@@ -14,7 +14,7 @@ scene: !include scenes.yaml
 #lovelace:
 #  mode: yaml 
 
-sensor: !include temp.yaml
+sensor: !include sensor.yaml
 
 weather:
   - platform: openweathermap
