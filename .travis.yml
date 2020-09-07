@@ -12,4 +12,4 @@ install:
   - pip3 install python-dateutil
 
 script:
-  - hass --script check_config --info all
+  - hass -c . --script check_config
