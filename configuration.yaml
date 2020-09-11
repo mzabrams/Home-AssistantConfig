@@ -12,9 +12,9 @@ script: !include scripts.yaml
 scene: !include scenes.yaml
 
 #lovelace:
-#  mode: yaml 
+#  mode: yaml
 
-sensor: !include sensor.yaml
+sensor: !include_dir_list sensors/
 camera: !include camera.yaml
 
 
@@ -28,4 +28,3 @@ weather:
 #    destination: zone.science_drive_garage
 #    region: 'US'
 #    units: imperial
-
