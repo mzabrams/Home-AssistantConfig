@@ -1,0 +1,16 @@
+Living Room Camera:
+    - camera.living_room_1
+    - switch.camera_1_h264_rtsp_server
+    - switch.camera_1_mjpeg_rtsp_server
+    - sensor.camera_1
+    - sensor.camera_1_light_sensor
+    - switch.camera_1_ir_filter
+    - switch.camera_1_ir_led
+    - switch.camera_1_night_mode
+    - switch.camera_1_night_mode_auto
+    - switch.camera_1_blue_led
+    - switch.camera_1_yellow_led
+    - switch.camera_1_motion_detection
+    - switch.camera_1_motion_tracking
+    - camera.camera_1_motion_snapshot
+    - binary_sensor.camera_1_motion_sensor
