@@ -1,0 +1,8 @@
+- platform: generic
+  name: Living Room 1
+  username: root
+  password: !secret living_room_1_password
+  authentication: basic
+  still_image_url: !secret living_room_1_url
+  verify_ssl: false
+  scan_interval: 1
