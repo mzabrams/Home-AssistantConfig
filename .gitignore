@@ -29,6 +29,7 @@ core
 hacs
 __pycache__
 deps
+www/mail_and_packages
 
 # Specific files to make sure we ignore
 home-assistant.log
