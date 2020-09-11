@@ -4,7 +4,7 @@ python: "3.7"
 
 before_install:
   - touch fake_key.pem
-  - mv travis_secrets.yaml secrets.yaml
+  - mv tests/travis_secrets.yaml secrets.yaml
 
 install:
   - pip3 install homeassistant
