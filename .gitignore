@@ -30,6 +30,11 @@ hacs
 __pycache__
 deps
 www/mail_and_packages
+custom_components/mail_and_packages/*.gif
+custom_components/mail_and_packages/*.jpg
+!custom_components/mail_and_packages/mail_none.gif
+!custom_components/mail_and_packages/image-no-mailpieces700.jpg
+
 
 # Specific files to make sure we ignore
 home-assistant.log
