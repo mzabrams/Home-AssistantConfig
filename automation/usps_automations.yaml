@@ -11,5 +11,5 @@
           {% if state_attr('sensor.mail_usps_mail','image') == None  %}
           /config/custom_components/mail_and_packages/mail_none.gif
           {% else %}
-          /config/www/mail_and_packages/{{ state_attr('sensor.mail_usps_mail','image') }}
+          /config/custom_components/mail_and_packages/{{ state_attr('sensor.mail_usps_mail','image') }}
           {% endif %}
