@@ -4,5 +4,16 @@
   password: !secret living_room_1_password
   authentication: basic
   still_image_url: !secret living_room_1_url
+  stream_source: !secret living_room_1_rtsp
+  verify_ssl: false
+  scan_interval: 1
+
+- platform: generic
+  name: Kitchen
+  username: root
+  password: !secret kitchen_password
+  authentication: basic
+  still_image_url: !secret kitchen_url
+  stream_source: !secret kitchen_rtsp
   verify_ssl: false
   scan_interval: 1
