@@ -32,6 +32,8 @@ deps
 www/mail_and_packages
 custom_components/mail_and_packages/*.gif
 custom_components/mail_and_packages/*.jpg
+images/mail_and_packages/*.gif
+images/mail_and_packages/*.jpg
 !custom_components/mail_and_packages/mail_none.gif
 !custom_components/mail_and_packages/image-no-mailpieces700.jpg
 
