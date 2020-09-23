@@ -25,5 +25,5 @@ weather:
     api_key: !secret openweathermap_api_key
 
 habitica:
-  - api_user: !secret HABITICA_USER
+  - api_user: !secret HABITICA_USERNAME
     api_key: !secret HABITICA_API_KEY
