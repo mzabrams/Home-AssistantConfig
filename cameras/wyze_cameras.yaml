@@ -6,7 +6,7 @@
   still_image_url: !secret living_room_1_url
   stream_source: !secret living_room_1_rtsp
   verify_ssl: false
-  scan_interval: 1
+  framerate: 5
 
 - platform: generic
   name: Kitchen
@@ -16,7 +16,7 @@
   still_image_url: !secret kitchen_url
   stream_source: !secret kitchen_rtsp
   verify_ssl: false
-  scan_interval: 1
+  framerate: 5
 
 - platform: generic
   name: Bedroom
@@ -26,4 +26,4 @@
   still_image_url: !secret bedroom_cam_url
   stream_source: !secret bedroom_cam_rtsp
   verify_ssl: false
-  scan_interval: 1
+  framerate: 5
