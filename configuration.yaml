@@ -24,9 +24,6 @@ weather:
   - platform: openweathermap
     api_key: !secret openweathermap_api_key
 
-#  - platform: waze_travel_time
-#    name: "Home to Campus"
-#    origin: zone.home
-#    destination: zone.science_drive_garage
-#    region: 'US'
-#    units: imperial
+habitica:
+  - api_user: !secret HABITICA_USER
+    api_key: !secret HABITICA_API_KEY
