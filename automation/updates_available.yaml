@@ -1,11 +1,11 @@
 # From github.com/brianjking/homeassistant-config
 - alias: "New Home Assistant Version Notifier"
-  initial"_state: True
-  hide_entity: True
   trigger:
-    platform: state
-    entity_id: updater.updater
+    - platform: state
+      entity_id: binary_sensor.updater
+      from: 'off'
+      to: 'on'
   action:
-    service: notify.mobile_app_mitchell_s_iphone
-    data_template:
-      message: "Home Assistant  {{ states.updater.updater.state }}  is now available."
+    - service: notify.mobile_app_mitchell_s_iphone
+      data_template:
+        message: "Home Assistant  {{ states.updater.updater.state }}  is now available."
