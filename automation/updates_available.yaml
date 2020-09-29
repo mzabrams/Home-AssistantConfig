@@ -6,6 +6,6 @@
     platform: state
     entity_id: updater.updater
   action:
-    service: !secret iPhone_Entity
+    service: notify.mobile_app_mitchell_s_iphone
     data_template:
       message: "Home Assistant  {{ states.updater.updater.state }}  is now available."
