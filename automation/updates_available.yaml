@@ -1,0 +1,11 @@
+# From github.com/brianjking/homeassistant-config
+- alias: "New Home Assistant Version Notifier"
+  initial"_state: True
+  hide_entity: True
+  trigger:
+    platform: state
+    entity_id: updater.updater
+  action:
+    service: !secret iPhone_Entity
+    data_template:
+      message: "Home Assistant  {{ states.updater.updater.state }}  is now available."
