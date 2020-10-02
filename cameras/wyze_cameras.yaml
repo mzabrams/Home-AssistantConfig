@@ -27,3 +27,13 @@
   stream_source: !secret bedroom_cam_rtsp
   verify_ssl: false
   framerate: 5
+
+#- platform: generic
+#  name: Living Room Beta
+#  stream_source: !secret living_room_beta_rtsp
+#  verify_ssl: false
+#  framerate: 5
+
+- platform: ffmpeg
+  name: Living Room Beta 2
+  input: !secret living_room_beta_rtsp
