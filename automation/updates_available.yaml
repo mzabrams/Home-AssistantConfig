@@ -8,4 +8,4 @@
   action:
     - service: notify.mobile_app_mitchell_s_iphone
       data_template:
-        message: "Home Assistant  {{ states.updater.updater.state }}  is now available."
+        message: "Home Assistant {{ state_attr('binary_sensor.updater', 'newest_version') }}  is now available."
