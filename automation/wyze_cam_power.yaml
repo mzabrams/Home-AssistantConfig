@@ -1,6 +1,6 @@
 # Disable power to Wyze cameras when I am home
 - alias: "Turn off security cameras when home"
-  triger:
+  trigger:
     - platform: state
       entity_id: person.mitchell
       to: 'home'
@@ -8,8 +8,8 @@
     - service: switch.turn_off
       entity_id: switch.living_room_wyze_power
 
-- alias: "Turn off security cameras when home"
-  triger:
+- alias: "Turn on security cameras when away"
+  trigger:
     - platform: state
       entity_id: person.mitchell
       from: 'home'

@@ -1,39 +1,15 @@
-- platform: generic
-  name: Living Room 1
-  username: root
-  password: !secret living_room_1_password
-  authentication: basic
-  still_image_url: !secret living_room_1_url
-  stream_source: !secret living_room_1_rtsp
-  verify_ssl: false
-  framerate: 5
-
-- platform: generic
-  name: Kitchen
-  username: root
-  password: !secret kitchen_password
-  authentication: basic
-  still_image_url: !secret kitchen_url
-  stream_source: !secret kitchen_rtsp
-  verify_ssl: false
-  framerate: 5
-
-- platform: generic
-  name: Bedroom
-  username: root
-  password: !secret bedroom_cam_password
-  authentication: basic
-  still_image_url: !secret bedroom_cam_url
-  stream_source: !secret bedroom_cam_rtsp
-  verify_ssl: false
-  framerate: 5
-
-#- platform: generic
-#  name: Living Room Beta
-#  stream_source: !secret living_room_beta_rtsp
-#  verify_ssl: false
-#  framerate: 5
+- platform: ffmpeg
+  name: Living Room Cam
+  input: !secret living_room_camp
 
 - platform: ffmpeg
-  name: Living Room Beta 2
-  input: !secret living_room_beta_rtsp
+  name: Bedroom Cam
+  input: !secret bedroom_cam
+
+- platform: ffmpeg
+  name: Kitchen Cam
+  input: !secret kitchen_cam
+
+- platform: ffmpeg
+  name: Percy Crate Cam
+  input: !secret percy_crate_cam
