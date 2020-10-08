@@ -1,0 +1,2 @@
+platform: aftership
+api_key: !secret AFTERSHIP_API_KEY
