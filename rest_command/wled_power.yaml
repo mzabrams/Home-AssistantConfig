@@ -1,0 +1,8 @@
+wled_bed_reboot:
+  url: !secret wled_bed_reboot_url
+wled_nightstand_left_reboot:
+  url: !secret wled_nightstand_left_reboot_url
+wled_nightstand_right_reboot:
+  url: !secret wled_nightstand_right_reboot_url
+wled_dresser_reboot:
+  url: !secret wled_dresser_reboot_url

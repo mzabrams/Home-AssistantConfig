@@ -1,0 +1,26 @@
+# Reboot and turn off daily, if not in use
+- alias: "Power cycle WLED daily"
+  trigger:
+    - platform: state
+      entity_id: person.mitchell
+      to: 'home'
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: 'light.wled'
+        state: 'off'
+      - condition: state
+        entity_id: 'light.wled_bed'
+        state: 'off'
+      - condition: state
+        entity_id: 'light.wled_nightstand_left'
+        state: 'off'
+      - condition: state
+        entity_id: 'light.wled_nightstand_right'
+        state: 'off'
+  action:
+    - service: rest_command.wled_bed_reboot
+    - service: rest_command.wled_dresser_reboot
+    - service: rest_command.wled_nightstand_left_reboot
+    - service: rest_command.wled_nightstand_right_reboot
