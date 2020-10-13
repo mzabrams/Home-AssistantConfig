@@ -1,1 +1,32 @@
-[]
+# Reboot and turn off daily, if not in use
+- id: power_cycle_wled_daily
+  alias: "Power cycle WLED daily"
+  trigger:
+    - platform: state
+      entity_id: person.mitchell
+      to: 'home'
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: 'light.wled_dresser'
+        state: 'off'
+      - condition: state
+        entity_id: 'light.wled_bed'
+        state: 'off'
+      - condition: state
+        entity_id: 'light.wled_nightstand_left'
+        state: 'off'
+      - condition: state
+        entity_id: 'light.wled_nightstand_right'
+        state: 'off'
+      - condition: time
+        after: '01:00:00'
+        before: '03:30:00'
+      - condition: template # only notify once every 6 seconds at most
+        value_template: "{{ ( as_timestamp(now()) - as_timestamp(state_attr('automation.power_cycle_wled', 'last_triggered')) |int(0) ) > 72000 }}"
+  action:
+    - service: rest_command.wled_bed_reboot
+    - service: rest_command.wled_dresser_reboot
+    - service: rest_command.wled_nightstand_left_reboot
+    - service: rest_command.wled_nightstand_right_reboot
