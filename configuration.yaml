@@ -32,3 +32,5 @@ weather:
 habitica:
   - api_user: !secret HABITICA_USERNAME
     api_key: !secret HABITICA_API_KEY
+
+rest_command: !include_dir_merge_named rest_command/
