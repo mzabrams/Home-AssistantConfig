@@ -6,7 +6,12 @@
       to: 'home'
   action:
     - service: switch.turn_off
-      entity_id: switch.living_room_wyze_power
+      entity_id: 
+        - switch.living_room_wyze_power
+        - switch.kitchen_cam
+    - service: input_boolean.turn_off
+      entity_id:
+        - input_boolean.alexa_ha_bedroom_cam
 
 - alias: "Turn on security cameras when away"
   trigger:
@@ -15,4 +20,9 @@
       from: 'home'
   action:
     - service: switch.turn_on
-      entity_id: switch.living_room_wyze_power
+      entity_id:
+        - switch.living_room_wyze_power
+        - switch.kitchen_cam
+    - service: input_boolean.turn_on
+      entity_id:
+        - input_boolean.alexa_ha_bedroom_cam
