@@ -24,6 +24,7 @@ sensor: !include_dir_list sensors/
 binary_sensor: !include_dir_merge_list binary_sensors/
 camera: !include_dir_merge_list cameras/
 
+!include devices/tasmota_outdoor.yaml
 
 weather:
   - platform: openweathermap
