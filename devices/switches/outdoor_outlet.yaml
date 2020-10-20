@@ -1,0 +1,12 @@
+- platform: mqtt
+  name: "Balcony Tasmota Outlet"
+  state_topic: "cmnd/balconyoutlets/STATE"
+  value_template: "{{ value_json.POWER1 }}"
+  command_topic: "cmnd/balconyoutlets/POWER1"
+  availability_topic: "tele/balconyoutlets/LWT"
+  qos: 1
+  payload_on: "ON"
+  payload_off: "OFF"
+  payload_available: "Online"
+  payload_not_available: "Offline"
+  retain: false
