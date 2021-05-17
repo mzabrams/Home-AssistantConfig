@@ -23,7 +23,8 @@ scene: !include scenes.yaml
 #lovelace:
 #  mode: yaml
 
-sensor: !include_dir_list sensors/
+#sensor: !include_dir_list sensors/
+sensor: !include sensors.yaml
 binary_sensor: !include_dir_merge_list binary_sensors/
 camera: !include_dir_merge_list cameras/
 
@@ -47,7 +48,7 @@ emulated_hue:
   entities:
     light.balcony_string_lights:
       name: "Balcony String Lights"
-      
+
 nest:
   client_id: !secret NEST_CLIENT_ID
   client_secret: !secret NEST_CLIENT_SECRET

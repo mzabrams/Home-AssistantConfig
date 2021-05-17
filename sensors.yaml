@@ -1,0 +1,113 @@
+- platform: moon
+- platform: season
+- platform: time_date
+  display_options:
+    - 'time'
+    - 'date'
+    - 'date_time'
+    - 'date_time_utc'
+    - 'date_time_iso'
+    - 'time_date'
+    - 'time_utc'
+    - 'beat'
+- platform: template
+  sensors:
+    timenew:
+      friendly_name: "XTime"
+      value_template: >
+        {% set time = states('sensor.time') %}
+        {% set hour = time[:2]|int %}
+        {{ '{:02d}:{} {}'.format(hour if hour == 12 else hour % 12, time[3:5], 'PM' if hour>11 else 'AM') }}
+- platform: systemmonitor
+  resources:
+    - type: disk_use_percent
+      arg: /home
+    - type: memory_free
+    - type: memory_use_percent
+    - type: load_1m
+    - type: load_5m
+    - type: load_15m
+    - type: processor_use
+    - type: processor_temperature
+- platform: waze_travel_time
+  name: "Home to Campus"
+  origin: zone.home
+  destination: zone.science_drive_garage
+  region: 'US'
+  units: imperial
+- platform: travisci
+  api_key: !secret TRAVIS_API_KEY
+- platform: openweathermap
+  api_key: !secret openweathermap_api_key
+  forecast: true
+  monitored_conditions:
+    - weather
+- platform: template
+  sensors:
+    mail_deliveries_message:
+      friendly_name: "Deliveries Summary"
+      value_template: >
+        {# Deliveries Sentence #}
+          {% macro deliveries_sentence() -%}
+                {%- if states("sensor.mail_usps_mail")|int == 0 -%}
+                  No
+                {%- else -%}
+                  {{states("sensor.mail_usps_mail")|int}}
+                {%- endif -%}
+              {{' '}}
+                {%- if states("sensor.mail_usps_mail")|int <= 1 -%}
+                  pieces of mail
+                {%- else -%}
+                  pieces of mail
+                {%- endif -%}
+              {{' '}}will be delivered.{{' '}}
+                {%- if states("sensor.mail_usps_delivering")|int == 0 -%}
+                  No
+                {%- else -%}
+                  {{states("sensor.mail_usps_delivering")|int}}
+                {%- endif -%}
+              {{' '}}
+                {%- if states("sensor.mail_usps_delivering")|int == 1 -%}
+                  USPS package is
+                {%- else -%}
+                  USPS packages are
+                {%- endif -%}
+              {{' '}}in transit.{{' '}}
+                {%- if states("sensor.mail_fedex_delivering")|int == 0 -%}
+                  No
+                {%- else -%}
+                  {{states("sensor.mail_fedex_delivering")|int}}
+                {%- endif -%}
+              {{' '}}
+                {%- if states("sensor.mail_fedex_delivering")|int == 1 -%}
+                  FedEx package is
+                {%- else -%}
+                  Fedex packages are
+                {%- endif -%}
+              {{' '}}in transit.{{' '}}
+              {%- if states("sensor.mail_ups_delivering")|int == 0 -%}
+                  No
+                {%- else -%}
+                  {{states("sensor.mail_ups_delivering")|int}}
+                {%- endif -%}
+              {{' '}}
+                {%- if states("sensor.mail_ups_delivering")|int == 1 -%}
+                  UPS package is
+                {%- else -%}
+                  UPS packages are
+                {%- endif -%}
+              {{' '}}in transit.{{' '}}
+              {%- if states("sensor.mail_amazon_packages")|int == 0 -%}
+                  No
+                {%- else -%}
+                  {{states("sensor.mail_amazon_packages")|int}}
+                {%- endif -%}
+              {{' '}}
+                {%- if states("sensor.mail_amazon_packages")|int == 1 -%}
+                  Amazon package is
+                {%- else -%}
+                  Amazon packages are
+                {%- endif -%}
+              {{' '}}in transit.{{' '}}
+          {%- endmacro %}
+        {{deliveries_sentence()}}
