@@ -3,10 +3,13 @@ default_config:
 cloud:
 stream:
 system_health:
+#pyscript:
+#  allow_all_imports: true
+#  hass_is_global: true
 
 #frontend
-frontend:
-  themes: !include_dir_merge_named themes
+#frontend:
+#  themes: !include_dir_merge_named themes
 
 # Text to speech
 tts:
@@ -36,3 +39,19 @@ habitica:
     api_key: !secret HABITICA_API_KEY
 
 rest_command: !include_dir_merge_named rest_command/
+
+emulated_hue:
+  expose_by_default: true
+  exposed_domains:
+    - light
+  entities:
+    light.balcony_string_lights:
+      name: "Balcony String Lights"
+      
+nest:
+  client_id: !secret NEST_CLIENT_ID
+  client_secret: !secret NEST_CLIENT_SECRET
+  # "Project ID" in the Device Access Console
+  project_id: !secret NEST_PROJECT_ID
+  # Provide the full path exactly as shown under "Subscription name" in Google Cloud Console
+  subscriber_id: !secret NEST_SUBSCRIBER_ID

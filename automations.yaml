@@ -4,6 +4,9 @@
   - platform: state
     entity_id: person.mitchell
     to: home
+  - platform: state
+    entity_id: sensor.mitchell_s_iphone_ssid
+    to: Occams Router
   action:
   - service: switch.turn_off
     entity_id:
@@ -91,4 +94,177 @@
   - service: rest_command.wled_dresser_reboot
   - service: rest_command.wled_nightstand_left_reboot
   - service: rest_command.wled_nightstand_right_reboot
+  mode: single
+- id: '1603226579558'
+  alias: New Automation
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: remote.home_assistant
+    to: 'On'
+  condition: []
+  action:
+  - service: light.turn_on
+    data: {}
+    entity_id: light.balcony_string_lights
+  mode: single
+- id: '1606347805924'
+  alias: When Roomba is cleaning set helper
+  description: ''
+  trigger:
+  - platform: device
+    device_id: d9f13b2b333c57799237afbfbd697561
+    domain: vacuum
+    entity_id: vacuum.roomba
+    type: cleaning
+  condition: []
+  action:
+  - service: input_datetime.set_datetime
+    data:
+      datetime: '{{ now().strftime(''%Y-%m-%d %H:%M:%S'') }}'
+    entity_id: input_datetime.last_roomba_clean
+  mode: single
+- id: '1606352631914'
+  alias: Run Roomba in AM
+  description: Run the Roomba in the morning when I leave, if I've been gone for more
+    than 5 minutes, and Roomba has not run yet today.
+  trigger:
+  - platform: state
+    entity_id: person.mitchell
+    for: 00:03:00
+    from: home
+  condition:
+  - condition: and
+    conditions:
+    - condition: state
+      entity_id: binary_sensor.roomba_bin_full
+      state: 'off'
+    - condition: template
+      value_template: '{% set last_run_day = state_attr(''input_datetime.last_roomba_clean'',
+        ''day'') %}
+
+        {% set last_run_month = state_attr(''input_datetime.last_roomba_clean'', ''month'')
+        %}
+
+        {% set last_run_year = state_attr(''input_datetime.last_roomba_clean'', ''year'')
+        %}
+
+        {{ (now().day > last_run_day) or (now().month > last_run_month) or (now().year
+        > last_run_year) }}'
+    - condition: device
+      device_id: d9f13b2b333c57799237afbfbd697561
+      domain: vacuum
+      entity_id: vacuum.roomba
+      type: is_docked
+  action:
+  - device_id: d9f13b2b333c57799237afbfbd697561
+    domain: vacuum
+    entity_id: vacuum.roomba
+    type: clean
+  - service: notify.mobile_app_mitchell_s_iphone
+    data_template:
+      message: Roomba is cleaning.
+  mode: single
+- id: '1606352792867'
+  alias: Stop Roomba when I'm arriving at home
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: person.mitchell
+    to: home
+    for: 00:01:00
+  condition:
+  - condition: device
+    device_id: d9f13b2b333c57799237afbfbd697561
+    domain: vacuum
+    entity_id: vacuum.roomba
+    type: is_cleaning
+  action:
+  - device_id: d9f13b2b333c57799237afbfbd697561
+    domain: vacuum
+    entity_id: vacuum.roomba
+    type: dock
+  - service: notify.mobile_app_mitchell_s_iphone
+    data_template:
+      message: Roomba is done cleaning.
+  mode: single
+- id: '1606419645622'
+  alias: Notify me when Roomba is Docked
+  description: ''
+  trigger:
+  - platform: device
+    domain: vacuum
+    entity_id: vacuum.roomba
+    device_id: d9f13b2b333c57799237afbfbd697561
+    type: docked
+  condition: []
+  action:
+  - service: notify.mobile_app_mitchell_s_iphone
+    data_template:
+      message: Roomba is docked.
+  mode: single
+- id: '1607385655050'
+  alias: Turn on security cameras when away (Duplicate)
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: sensor.mitchell_s_iphone_ssid
+    from: Occams Router
+  condition: []
+  action:
+  - service: switch.turn_on
+    entity_id:
+    - switch.living_room_wyze_power
+    - switch.kitchen_cam
+  - service: input_boolean.turn_on
+    entity_id:
+    - input_boolean.alexa_ha_bedroom_cam
+  - service: notify.mobile_app_mitchell_s_iphone
+    data_template:
+      message: Home cameras turned on.
+  mode: single
+- id: '1617144197495'
+  alias: Set Nest to Heat if temperature below 50 degrees
+  description: ''
+  trigger:
+  - platform: time_pattern
+    minutes: '15'
+  condition:
+  - condition: numeric_state
+    entity_id: weather.home_2
+    below: '55'
+    attribute: temperature
+  - condition: state
+    entity_id: climate.entryway
+    attribute: preset_mode
+    state: none
+  action:
+  - service: climate.set_hvac_mode
+    target:
+      device_id: 6d8e84b26f7f7bd5f55eed9f034f2c21
+    data:
+      hvac_mode: heat
+  mode: single
+- id: '1617144354315'
+  alias: Set Nest to Cool if temperature above 65 degrees
+  description: ''
+  trigger:
+  - platform: time_pattern
+    minutes: '15'
+  condition:
+  - condition: numeric_state
+    entity_id: weather.home_2
+    above: '65'
+    attribute: temperature
+  - condition: state
+    entity_id: climate.entryway
+    attribute: preset_mode
+    state: none
+  action:
+  - service: climate.set_hvac_mode
+    target:
+      entity_id:
+      - climate.entryway
+    data:
+      hvac_mode: cool
   mode: single

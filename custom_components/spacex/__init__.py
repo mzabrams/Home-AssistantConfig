@@ -8,8 +8,8 @@ import voluptuous as vol
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ConfigEntryNotReady, PlatformNotReady
-from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
+from homeassistant.exceptions import ConfigEntryNotReady
+from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from .const import COORDINATOR, DOMAIN, SPACEX_API
 
@@ -107,16 +107,18 @@ class SpaceXUpdateCoordinator(DataUpdateCoordinator):
             spacex_starman = await self.api.get_roadster_status()
             spacex_next_launch = await self.api.get_next_launch()
             spacex_latest_launch = await self.api.get_latest_launch()
+
+            return {
+                "starman": spacex_starman,
+                "next_launch": spacex_next_launch,
+                "latest_launch": spacex_latest_launch,
+            }
         except ConnectionError as error:
             _LOGGER.info("SpaceX API: %s", error)
-            raise PlatformNotReady from error
+            raise UpdateFailed from error
         except ValueError as error:
             _LOGGER.info("SpaceX API: %s", error)
-            raise ConfigEntryNotReady from error
+            raise UpdateFailed from error
 
-        return {
-            "starman": spacex_starman,
-            "next_launch": spacex_next_launch,
-            "latest_launch": spacex_latest_launch,
-        }
+        
 

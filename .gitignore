@@ -13,11 +13,11 @@
 *.conf
 *.pickle
 *.db-journal
-*.db-shm
-*.db-wal
+*.db-shm*
+*.db-wal*
 *.sqlite
 *.log
-*.db
+*.db*
 *.sqlite
 
 # Ignore folders.

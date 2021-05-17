@@ -1,6 +1,5 @@
 """Common classes and functions for Zoom."""
 from datetime import timedelta
-import json
 from logging import getLogger
 from typing import Any, Dict, List
 
@@ -9,13 +8,39 @@ from homeassistant.components.http.view import HomeAssistantView
 from homeassistant.const import HTTP_OK
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import config_entry_oauth2_flow
-from homeassistant.helpers.network import get_url
+from homeassistant.helpers.network import NoURLAvailableError, get_url
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from .api import ZoomAPI
-from .const import DEFAULT_NAME, DOMAIN, HA_URL, HA_ZOOM_EVENT, WEBHOOK_RESPONSE_SCHEMA
+from .const import (
+    DEFAULT_NAME,
+    DOMAIN,
+    HA_URL,
+    HA_ZOOM_EVENT,
+    VERIFICATION_TOKENS,
+    WEBHOOK_RESPONSE_SCHEMA,
+)
 
 _LOGGER = getLogger(__name__)
+
+
+def valid_external_url(hass: HomeAssistant) -> bool:
+    """Return whether a valid external URL for HA is available."""
+    try:
+        get_url(hass, allow_internal=False, prefer_cloud=True)
+        return True
+    except NoURLAvailableError:
+        _LOGGER.error(
+            "You do not have an external URL for your Home Assistant instance "
+            "configured which is needed to set up the Zoom integration. "
+            "You need to set the `external_url` property in the "
+            "`homeassistant` section of your `configuration.yaml`, or set the "
+            "`External URL` property in the Home Assistant `General "
+            "Configuration` UI, before trying to setup the Zoom integration "
+            "again. You can learn more about configuring this parameter at "
+            "https://www.home-assistant.io/docs/configuration/basic"
+        )
+        return False
 
 
 def get_contact_name(contact: dict) -> str:
@@ -43,9 +68,11 @@ class ZoomOAuth2Implementation(config_entry_oauth2_flow.LocalOAuth2Implementatio
         authorize_url: str,
         token_url: str,
         verification_token: str,
+        name: str,
     ) -> None:
         """Initialize local auth implementation."""
         self._verification_token = verification_token
+        self._name = name
         super().__init__(
             hass, domain, client_id, client_secret, authorize_url, token_url
         )
@@ -53,12 +80,12 @@ class ZoomOAuth2Implementation(config_entry_oauth2_flow.LocalOAuth2Implementatio
     @property
     def name(self) -> str:
         """Name of the implementation."""
-        return DEFAULT_NAME
+        return self._name
 
     @property
     def domain(self) -> str:
         """Domain of the implementation."""
-        return self._domain
+        return self._name
 
     @property
     def redirect_uri(self) -> str:
@@ -75,35 +102,35 @@ class ZoomWebhookRequestView(HomeAssistantView):
     url = HA_URL
     name = HA_URL[1:].replace("/", ":")
 
-    def __init__(self, verification_token: str) -> None:
-        """Initialize view."""
-        self._verification_token = verification_token
-
     async def post(self, request: Request) -> Response:
         """Respond to requests from the device."""
         hass = request.app["hass"]
         headers = request.headers
+        verification_tokens = hass.data.get(DOMAIN, {}).get(VERIFICATION_TOKENS, set())
+        tokens = headers.getall("authorization")
 
-        if not (
-            "authorization" in headers
-            and headers["authorization"] == self._verification_token
-        ):
-            _LOGGER.warning(
-                "Received unauthorized request: %s (Headers: %s)",
-                await request.text(),
-                json.dumps(request.headers),
-            )
-        else:
-            try:
-                data = await request.json()
-                status = WEBHOOK_RESPONSE_SCHEMA(data)
-                _LOGGER.debug("Received event: %s", json.dumps(status))
-                hass.bus.async_fire(HA_ZOOM_EVENT, status)
-            except:
-                _LOGGER.warning(
-                    "Received authorized but unknown event: %s", await request.text()
-                )
+        for token in tokens:
+            if not verification_tokens or (token and token in verification_tokens):
+                try:
+                    data = await request.json()
+                    status = WEBHOOK_RESPONSE_SCHEMA(data)
+                    _LOGGER.debug("Received event: %s", status)
+                    hass.bus.async_fire(
+                        f"{HA_ZOOM_EVENT}", {"status": status, "token": token}
+                    )
+                except Exception as err:
+                    _LOGGER.warning(
+                        "Received authorized event but unable to parse: %s (%s)",
+                        await request.text(),
+                        err,
+                    )
+                return Response(status=HTTP_OK)
 
+        _LOGGER.warning(
+            "Received unauthorized request: %s (Headers: %s)",
+            await request.text(),
+            request.headers,
+        )
         return Response(status=HTTP_OK)
 
 

@@ -1,6 +1,6 @@
 - platform: mqtt
   name: "Balcony String Lights"
-  state_topic: "tele/balconyoutlets/STATE"
+  state_topic: "stat/balconyoutlets/RESULT"
   value_template: "{{ value_json.POWER2 }}"
   command_topic: "cmnd/balconyoutlets/POWER2"
   availability_topic: "tele/balconyoutlets/LWT"

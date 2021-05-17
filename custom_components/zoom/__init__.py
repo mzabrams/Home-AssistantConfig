@@ -1,10 +1,13 @@
 """The Zoom integration."""
 from logging import getLogger
+from typing import Dict, List
 
-from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry
-from homeassistant.const import CONF_CLIENT_ID, CONF_CLIENT_SECRET, CONF_ID
+from aiohttp.client_exceptions import ClientResponseError
+from aiohttp.web_exceptions import HTTPUnauthorized
+from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntry
+from homeassistant.const import CONF_CLIENT_ID, CONF_CLIENT_SECRET, CONF_ID, CONF_NAME
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers import config_entry_oauth2_flow
+from homeassistant.helpers import config_entry_oauth2_flow, config_validation as cv
 from homeassistant.helpers.typing import ConfigType
 import voluptuous as vol
 
@@ -13,6 +16,7 @@ from .common import (
     ZoomOAuth2Implementation,
     ZoomUserProfileDataUpdateCoordinator,
     ZoomWebhookRequestView,
+    valid_external_url,
 )
 from .config_flow import ZoomOAuth2FlowHandler
 from .const import (
@@ -22,36 +26,56 @@ from .const import (
     OAUTH2_AUTHORIZE,
     OAUTH2_TOKEN,
     USER_PROFILE_COORDINATOR,
+    VERIFICATION_TOKENS,
     ZOOM_SCHEMA,
 )
 
 _LOGGER = getLogger(__name__)
 
-CONFIG_SCHEMA = vol.Schema({DOMAIN: ZOOM_SCHEMA}, extra=vol.ALLOW_EXTRA)
+
+def ensure_multiple_have_names(value: List[Dict[str, str]]) -> List[Dict[str, str]]:
+    """Validate that for multiple entries, they have names."""
+    if len({entry[CONF_NAME] for entry in value}) != len(value):
+        raise vol.Invalid(
+            "You must provide a unique name for each Zoom app when providing "
+            "multiple sets of application credentials."
+        )
+
+    return value
+
+
+CONFIG_SCHEMA = vol.Schema(
+    {DOMAIN: vol.All(cv.ensure_list, [ZOOM_SCHEMA], ensure_multiple_have_names)},
+    extra=vol.ALLOW_EXTRA,
+)
 
 PLATFORMS = ["binary_sensor"]
 
 
 async def async_setup(hass: HomeAssistant, config: ConfigType):
     """Set up the Zoom component."""
-    hass.data.setdefault(DOMAIN, {})
+    hass.data.setdefault(DOMAIN, {}).setdefault(VERIFICATION_TOKENS, set())
 
     if DOMAIN not in config:
         return True
 
-    ZoomOAuth2FlowHandler.async_register_implementation(
-        hass,
-        ZoomOAuth2Implementation(
+    if not valid_external_url(hass):
+        return False
+
+    for app in config[DOMAIN]:
+        ZoomOAuth2FlowHandler.async_register_implementation(
             hass,
-            DOMAIN,
-            config[DOMAIN][CONF_CLIENT_ID],
-            config[DOMAIN][CONF_CLIENT_SECRET],
-            OAUTH2_AUTHORIZE,
-            OAUTH2_TOKEN,
-            config[DOMAIN][CONF_VERIFICATION_TOKEN],
-        ),
-    )
-    hass.data[DOMAIN][SOURCE_IMPORT] = True
+            ZoomOAuth2Implementation(
+                hass,
+                DOMAIN,
+                app[CONF_CLIENT_ID],
+                app[CONF_CLIENT_SECRET],
+                OAUTH2_AUTHORIZE,
+                OAUTH2_TOKEN,
+                app[CONF_VERIFICATION_TOKEN],
+                app[CONF_NAME],
+            ),
+        )
 
     return True
 
@@ -74,6 +98,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             OAUTH2_AUTHORIZE,
             OAUTH2_TOKEN,
             entry.data[CONF_VERIFICATION_TOKEN],
+            entry.data[CONF_NAME],
         )
         ZoomOAuth2FlowHandler.async_register_implementation(hass, implementation)
 
@@ -82,13 +107,35 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     await coordinator.async_refresh()
     hass.data[DOMAIN][entry.entry_id][USER_PROFILE_COORDINATOR] = coordinator
     hass.data[DOMAIN][entry.entry_id][API] = api
-    my_profile = await api.async_get_my_user_profile()
+    hass.data[DOMAIN][VERIFICATION_TOKENS].add(entry.data[CONF_VERIFICATION_TOKEN])
+
+    try:
+        my_profile = await api.async_get_my_user_profile()
+    except (HTTPUnauthorized, ClientResponseError) as err:
+        if isinstance(err, ClientResponseError) and err.status != 401:
+            return False
+
+        # If we are not authorized, we need to revalidate OAuth
+        if not [
+            flow
+            for flow in hass.config_entries.flow.async_progress()
+            if flow["context"]["source"] == SOURCE_REAUTH
+            and flow["context"]["unique_id"] == entry.unique_id
+        ]:
+            hass.async_create_task(
+                hass.config_entries.flow.async_init(
+                    DOMAIN,
+                    context={"source": SOURCE_REAUTH, "unique_id": entry.unique_id},
+                    data=entry.data,
+                )
+            )
+        return False
     new_data = entry.data.copy()
-    new_data[CONF_ID] = my_profile.get("id")
-    hass.config_entries.async_update_entry(entry, data=new_data)
+    new_data[CONF_ID] = my_profile.get("id")  # type: ignore
+    hass.config_entries.async_update_entry(entry, data=new_data)  # type: ignore
 
     # Register view
-    hass.http.register_view(ZoomWebhookRequestView(entry.data[CONF_VERIFICATION_TOKEN]))
+    hass.http.register_view(ZoomWebhookRequestView())
 
     for platform in PLATFORMS:
         hass.async_create_task(
